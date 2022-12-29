@@ -63,8 +63,8 @@ func VerifyDriverInstallation() error {
 	return nil
 }
 
-// ConfigureCachedInstalltion updates ldconfig and installs the cached GPU driver kernel modules.
-func ConfigureCachedInstalltion(gpuInstallDirHost string, needSigned, test bool) error {
+// ConfigureCachedInstallation updates ldconfig and installs the cached GPU driver kernel modules.
+func ConfigureCachedInstallation(gpuInstallDirHost string, needSigned, test bool) error {
 	log.V(2).Info("Configuring cached driver installation")
 
 	if err := createHostDirBindMount(gpuInstallDirHost, gpuInstallDirContainer); err != nil {
@@ -93,8 +93,8 @@ func DownloadToInstallDir(url, infoStr string) (string, error) {
 
 // DownloadDriverInstaller downloads GPU driver installer given driver version and COS version.
 func DownloadDriverInstaller(driverVersion, cosMilestone, cosBuildNumber string) (string, error) {
-	log.Infof("Downloading GPU driver installer version %s", driverVersion)
 	downloadURL, err := getDriverInstallerDownloadURL(driverVersion, cosMilestone, cosBuildNumber)
+	log.Infof("Downloading GPU driver installer version %s: %s", driverVersion, downloadURL)
 	if err != nil {
 		return "", errors.Wrap(err, "failed to get driver installer download URL")
 	}
@@ -531,7 +531,7 @@ func loadGPUDrivers(needSigned, test bool) error {
 		}
 		// Load public key to IMA keyring for GSP firmware. For backward compatibility, it's OK if pubkey cannot be loaded.
 		if err := modules.LoadPublicKey("gpu-key", filepath.Join(gpuInstallDirContainer, "pubkey.der"), modules.IMAKeyring); err != nil {
-			log.Infof("Falied to load public key to IMA keyring, err: %v", err)
+			log.Infof("Failed to load public key to IMA keyring, err: %v", err)
 		}
 	}
 	gpuModules := map[string]string{
@@ -589,10 +589,10 @@ func prepareGSPFirmware(extractDir, driverVersion string, needSigned bool) error
 
 func copyFirmware(installerGSPPath, containerGSPPath, driverVersion string) error {
 	if err := os.MkdirAll(filepath.Dir(containerGSPPath), defaultFilePermission); err != nil {
-		return fmt.Errorf("Falied to create firmware directory, err: %v", err)
+		return fmt.Errorf("Failed to create firmware directory, err: %v", err)
 	}
 	if err := utils.CopyFile(installerGSPPath, containerGSPPath); err != nil {
-		return fmt.Errorf("Falied to copy %s, err: %v", gspFileName, err)
+		return fmt.Errorf("Failed to copy %s, err: %v", gspFileName, err)
 	}
 	return nil
 }

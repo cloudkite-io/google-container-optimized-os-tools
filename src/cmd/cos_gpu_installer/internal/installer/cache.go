@@ -69,7 +69,7 @@ func (c *Cacher) IsCached() (bool, error) {
 		log.Infof("error: %v", err)
 		return false, err
 	}
-	log.Infof("%v", cacheMap)
+	log.Infof("GPU Driver cache: %v", cacheMap)
 
 	return (c.buildNumber == cacheMap[buildNumberKey] &&
 		c.driverVersion == cacheMap[driverVersionKey]), nil

@@ -5,7 +5,6 @@ import (
 	"bytes"
 	"encoding/binary"
 	"io"
-	"io/ioutil"
 	"os"
 	"os/exec"
 	"path/filepath"
@@ -70,14 +69,16 @@ func UpdateHostLdCache(hostRootDir, moduleLibDir string) error {
 func LoadPublicKey(keyName, keyPath, keyring string) error {
 	log.Infof("Loading %s to keyring %s", keyName, keyring)
 
-	keyBytes, err := ioutil.ReadFile(keyPath)
+	keyBytes, err := os.ReadFile(keyPath)
 	if err != nil {
 		return errors.Wrapf(err, "failed to read key %s", keyPath)
 	}
 
 	cmd := execCommand("/bin/keyctl", "padd", "asymmetric", keyName, keyring)
 	cmd.Stdin = bytes.NewBuffer(keyBytes)
-	if err := cmd.Run(); err != nil {
+	output, err := cmd.CombinedOutput()
+	if err != nil {
+		log.Errorf("Error loading key: %s", output)
 		return errors.Wrapf(err, "failed to load %s to keyring %s", keyName, keyring)
 	}
 	log.Infof("Successfully load key %s into keyring %s.", keyName, keyring)
@@ -87,7 +88,7 @@ func LoadPublicKey(keyName, keyPath, keyring string) error {
 // AppendSignature appends a raw PKCS#7 signature to the end of a given kernel module.
 // This is basically the Go implementation of `scripts/sign-file -s` in Linux upstream.
 func AppendSignature(outfilePath, modulefilePath, sigfilePath string) error {
-	tempFile, err := ioutil.TempFile("", "tempFile")
+	tempFile, err := os.CreateTemp("", "tempFile")
 	if err != nil {
 		return errors.Wrap(err, "failed to create temp file")
 	}

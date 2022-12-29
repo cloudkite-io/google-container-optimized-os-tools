@@ -226,7 +226,7 @@ func (c *InstallCommand) Execute(ctx context.Context, _ *flag.FlagSet, _ ...inte
 		cacher = installer.NewCacher(hostInstallDir, envReader.BuildNumber(), c.driverVersion)
 		if isCached, err := cacher.IsCached(); isCached && err == nil {
 			log.V(2).Info("Found cached version, NOT building the drivers.")
-			if err := installer.ConfigureCachedInstalltion(hostInstallDir, !c.unsignedDriver, c.test); err != nil {
+			if err := installer.ConfigureCachedInstallation(hostInstallDir, !c.unsignedDriver, c.test); err != nil {
 				c.logError(errors.Wrap(err, "failed to configure cached installation"))
 				return subcommands.ExitFailure
 			}
@@ -257,7 +257,7 @@ func getDriverVersion(downloader *cos.GCSDownloader, argVersion string) (string,
 	} else if argVersion == "latest" {
 		return installer.GetLatestGPUDriverVersion(downloader)
 	}
-	// argVersion is an acutal verson, return it as-is.
+	// argVersion is an actual version, return it as-is.
 	return argVersion, nil
 }
 
